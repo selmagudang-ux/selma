@@ -2,6 +2,7 @@
 const API_URL =
 "https://script.google.com/macros/s/AKfycbzWWAZbQD6Lp-HRE9_o5Erxnqcy66Mm9L4EqlBGesauaM5pC52hbI-S4VelP6SoHh2R/exec";
 
+let skuData = [];
 
 async function loadSKU() {
 
