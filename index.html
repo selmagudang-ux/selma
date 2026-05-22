@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Upload Foto SKU</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="box">
+
+  <h1>Upload Foto Produk</h1>
+
+  <input
+    type="text"
+    id="sku"
+    list="sku-list"
+    placeholder="Masukkan SKU">
+
+  <datalist id="sku-list"></datalist>
+
+  <input
+  type="file"
+  id="image">
+
+  <img
+  id="preview"
+  style="
+    width:100%;
+    margin-top:15px;
+    border-radius:10px;
+    display:none;
+  ">
+  <h3>Foto Lama</h3>
+
+<img
+  id="old-preview"
+  style="
+    width:100%;
+    border-radius:10px;
+    display:none;
+  ">
+
+  <button onclick="uploadImage()">
+    Upload
+  </button>
+  
+  <button onclick="deleteImage()">
+  Hapus Foto
+</button>
+
+  <p id="status"></p>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
