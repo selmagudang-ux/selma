@@ -12,7 +12,7 @@ async function loadSKU() {
 
   skuData =
     await response.json();
-
+    console.log(skuData);
   const datalist =
     document.getElementById("sku-list");
 
