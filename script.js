@@ -1,6 +1,6 @@
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbz07Jd4yFMPKgBm7JgHkGLWBkKNRBr8BM20ifnl9__VVwyH7NOGD-wVWnA4fSvknz3h/exec";
+"https://script.google.com/macros/s/AKfycby3o6bUEgkmLVtfXgYcMZtf5OYQWkPUinOpJq88QjwsKqfIaa9HAbHMV0QZdSchoBCr/exec";
 
 let skuData = [];
 
