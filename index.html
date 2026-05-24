@@ -12,17 +12,26 @@
 
   <h1>Upload Foto Produk</h1>
 
-  <input
-    type="text"
-    id="sku"
-    list="sku-list"
-    placeholder="Masukkan SKU">
+ <textarea
+  id="sku"
+  placeholder="1 baris = 1 SKU"></textarea>
 
-  <datalist id="sku-list"></datalist>
+  <div
+  class="drop-area"
+  id="drop-area">
+
+  <p>Drag & Drop Foto</p>
+
+  <p class="small">
+    atau klik untuk pilih file
+  </p>
 
   <input
-  type="file"
-  id="image">
+    type="file"
+    id="image"
+    hidden>
+
+</div>
 
   <img
   id="preview"
