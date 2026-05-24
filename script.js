@@ -271,13 +271,83 @@ dropArea.addEventListener(
     fileInput.files =
       files;
 
-    previewImage(
-      files[0]
+    handleFiles(
+  fileInput.files
     );
   }
 );
 
+function handleFiles(files) {
 
+  const bulkPreview =
+    document.getElementById(
+      "bulk-preview"
+    );
+
+
+
+  bulkPreview.innerHTML = "";
+
+
+
+  selectedSKU = [];
+
+
+
+  Array.from(files)
+    .forEach(file => {
+
+      const filename =
+        file.name
+        .split(".")[0]
+        .trim();
+
+
+
+      const found =
+        skuData.find(
+          item =>
+            item.sku ==
+            filename
+        );
+
+
+
+      if (found) {
+
+        selectedSKU.push(
+          filename
+        );
+
+
+
+        bulkPreview.innerHTML += `
+
+        <div class="bulk-item">
+
+          ✅ ${filename}
+
+        </div>
+        `;
+
+      } else {
+
+        bulkPreview.innerHTML += `
+
+        <div class="bulk-item">
+
+          ❌ ${filename}
+          (SKU tidak ada)
+
+        </div>
+        `;
+      }
+    });
+
+
+
+  renderSKU();
+}
 
 // pilih file
 fileInput.addEventListener(
