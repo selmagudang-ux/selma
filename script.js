@@ -406,7 +406,8 @@ async function uploadImage() {
           "✅ Upload berhasil ke "
           + skuList.length +
           " SKU";
-
+        
+        resetForm();
 
 
       } catch(err) {
@@ -471,7 +472,7 @@ async function deleteImage() {
   ).innerHTML =
     "Foto berhasil dihapus";
 }
-
+resetForm();
 
 function resetForm() {
 
