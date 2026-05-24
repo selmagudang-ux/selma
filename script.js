@@ -471,3 +471,41 @@ async function deleteImage() {
   ).innerHTML =
     "Foto berhasil dihapus";
 }
+
+
+function resetForm() {
+
+  // kosongkan input sku
+  document
+    .getElementById("sku")
+    .value = "";
+
+
+
+  // kosongkan array sku
+  selectedSKU = [];
+
+
+
+  // render ulang
+  renderSKU();
+
+
+
+  // reset file input
+  fileInput.value = "";
+
+
+
+  // sembunyikan preview baru
+  document
+    .getElementById("preview")
+    .style.display = "none";
+
+
+
+  // sembunyikan preview lama
+  document
+    .getElementById("old-preview")
+    .style.display = "none";
+}
