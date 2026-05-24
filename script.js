@@ -443,7 +443,8 @@ async function deleteImage() {
     return;
   }
 
-
+ status.innerHTML =
+    "Deleting...";
 
   for (
     const sku of skuList
