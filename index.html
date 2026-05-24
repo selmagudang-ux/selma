@@ -12,51 +12,105 @@
 </head>
 
 <body>
+
+
+
+<!-- =========================
+DASHBOARD
+========================= -->
 <div class="dashboard">
 
   <div class="card">
+
     <h2 id="total-sku">0</h2>
+
     <p>Total SKU</p>
+
   </div>
 
+
+
   <div class="card">
+
     <h2 id="with-image">0</h2>
+
     <p>Sudah Ada Foto</p>
+
   </div>
 
+
+
   <div class="card">
+
     <h2 id="without-image">0</h2>
+
     <p>Belum Ada Foto</p>
+
   </div>
 
 </div>
+
+
+
+
+
+<!-- =========================
+MAIN BOX
+========================= -->
 <div class="box">
 
   <h1>Upload Foto Produk</h1>
 
-<div class="search-box">
 
-  <input
-    type="text"
-    id="sku"
-    placeholder="Cari SKU">
 
-  <div id="suggestions"></div>
 
-</div>
 
-  
-<button
-  type="button"
-  onclick="addSKU()">
+  <!-- =========================
+  SEARCH SKU
+  ========================= -->
+  <div class="search-box">
 
-  Tambah SKU
+    <input
+      type="text"
+      id="sku"
+      autocomplete="off"
+      placeholder="Cari SKU">
 
-</button>
-  
-<div id="sku-container"></div>
+    <div id="suggestions"></div>
 
-  
+  </div>
+
+
+
+
+
+  <!-- =========================
+  BUTTON TAMBAH SKU
+  ========================= -->
+  <button
+    type="button"
+    onclick="addSKU()">
+
+    Tambah SKU
+
+  </button>
+
+
+
+
+
+  <!-- =========================
+  LIST SKU TERPILIH
+  ========================= -->
+  <div id="sku-container"></div>
+
+
+
+
+
+  <!-- =========================
+  DRAG AREA
+  ========================= -->
   <div
     class="drop-area"
     id="drop-area">
@@ -64,19 +118,28 @@
     <p>Drag & Drop Foto</p>
 
     <p class="small">
+
       atau klik untuk pilih file
+
     </p>
 
+
+
     <input
-  type="file"
-  id="image"
-  multiple
-  hidden>
+      type="file"
+      id="image"
+      multiple
+      hidden>
 
   </div>
 
 
 
+
+
+  <!-- =========================
+  PREVIEW FOTO BARU
+  ========================= -->
   <img
     id="preview"
     style="
@@ -85,9 +148,23 @@
       border-radius:10px;
       display:none;
     ">
-<div id="bulk-preview"></div>
 
 
+
+
+
+  <!-- =========================
+  BULK PREVIEW
+  ========================= -->
+  <div id="bulk-preview"></div>
+
+
+
+
+
+  <!-- =========================
+  FOTO LAMA
+  ========================= -->
   <h3>Foto Lama</h3>
 
   <img
@@ -101,22 +178,49 @@
 
 
 
-  <button onclick="uploadImage()">
-    Upload
-  </button>
+
+
+  <!-- =========================
+  ACTION BUTTON
+  ========================= -->
+  <div class="button-group">
+
+    <button
+      onclick="uploadImage()">
+
+      Upload
+
+    </button>
 
 
 
-  <button onclick="deleteImage()">
-    Hapus Foto
-  </button>
+    <button
+      onclick="deleteImage()">
+
+      Hapus Foto
+
+    </button>
+
+  </div>
 
 
 
+
+
+  <!-- =========================
+  STATUS
+  ========================= -->
   <p id="status"></p>
 
 </div>
 
+
+
+
+
+<!-- =========================
+SCRIPT
+========================= -->
 <script src="script.js"></script>
 
 </body>
