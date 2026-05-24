@@ -430,6 +430,11 @@ async function deleteImage() {
   const skuList =
     selectedSKU;
 
+  const status =
+    document.getElementById(
+      "status"
+    );
+
 
 
   if (
@@ -443,40 +448,54 @@ async function deleteImage() {
     return;
   }
 
- status.innerHTML =
+
+
+  status.innerHTML =
     "Deleting...";
 
-  for (
-    const sku of skuList
-  ) {
 
-    await fetch(
-      API_URL,
-      {
 
-        method: "POST",
+  try {
 
-        body: JSON.stringify({
+    for (
+      const sku of skuList
+    ) {
 
-          action: "delete",
+      await fetch(
+        API_URL,
+        {
 
-          sku: sku
-        })
-      }
-    );
+          method: "POST",
+
+          body: JSON.stringify({
+
+            action: "delete",
+
+            sku: sku
+          })
+        }
+      );
+    }
+
+
+
+    status.innerHTML =
+      "✅ Foto berhasil dihapus";
+
+
+
+    resetForm();
+
+
+
+  } catch(err) {
+
+    console.log(err);
+
+    status.innerHTML =
+      "❌ Gagal menghapus foto";
   }
-
-
-
-  document.getElementById(
-    "status"
-  ).innerHTML =
-    "Foto berhasil dihapus";
-  
-resetForm();
 }
-
-
 function resetForm() {
 
   // kosongkan input sku
