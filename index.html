@@ -19,9 +19,23 @@
 
 
 
-  <textarea
-    id="sku"
-    placeholder="1 baris = 1 SKU"></textarea>
+  <input
+  type="text"
+  id="sku"
+  list="sku-list"
+  placeholder="Masukkan SKU">
+<button
+  type="button"
+  onclick="addSKU()">
+
+  Tambah SKU
+
+</button>
+  
+<div id="sku-container"></div>
+
+<datalist id="sku-list"></datalist>
+  
 
 
 
