@@ -8,7 +8,9 @@ let skuData = [];
 
 
 
-// load sku
+// =========================
+// LOAD SKU
+// =========================
 async function loadSKU() {
 
   const response = await fetch(
@@ -47,9 +49,19 @@ async function loadSKU() {
       option
     );
   });
+
+
+
+  updateDashboard();
 }
 
 loadSKU();
+
+
+
+// =========================
+// CEK ADA FOTO
+// =========================
 function hasImage(sku) {
 
   const found =
@@ -65,8 +77,9 @@ function hasImage(sku) {
 
 
 
-
-// tambah sku
+// =========================
+// TAMBAH SKU
+// =========================
 function addSKU() {
 
   const input =
@@ -144,9 +157,9 @@ function addSKU() {
 
 
 
-
-
-// render sku
+// =========================
+// RENDER SKU
+// =========================
 function renderSKU() {
 
   const container =
@@ -185,9 +198,9 @@ function renderSKU() {
 
 
 
-
-
-// remove sku
+// =========================
+// REMOVE SKU
+// =========================
 function removeSKU(index) {
 
   selectedSKU.splice(
@@ -200,9 +213,9 @@ function removeSKU(index) {
 
 
 
-
-
-// drag drop
+// =========================
+// DRAG DROP
+// =========================
 const dropArea =
   document.getElementById(
     "drop-area"
@@ -271,12 +284,44 @@ dropArea.addEventListener(
     fileInput.files =
       files;
 
+
+
     handleFiles(
-  fileInput.files
+      fileInput.files
+    );
+
+
+
+    previewImage(
+      fileInput.files[0]
     );
   }
 );
 
+
+
+// pilih file
+fileInput.addEventListener(
+  "change",
+  () => {
+
+    handleFiles(
+      fileInput.files
+    );
+
+
+
+    previewImage(
+      fileInput.files[0]
+    );
+  }
+);
+
+
+
+// =========================
+// HANDLE FILES
+// =========================
 function handleFiles(files) {
 
   const bulkPreview =
@@ -349,22 +394,11 @@ function handleFiles(files) {
   renderSKU();
 }
 
-// pilih file
-fileInput.addEventListener(
-  "change",
-  () => {
-
-    previewImage(
-      fileInput.files[0]
-    );
-  }
-);
 
 
-
-
-
-// preview foto baru
+// =========================
+// PREVIEW FOTO BARU
+// =========================
 function previewImage(file) {
 
   if (!file) return;
@@ -402,9 +436,9 @@ function previewImage(file) {
 
 
 
-
-
-// upload
+// =========================
+// UPLOAD
+// =========================
 async function uploadImage() {
 
   const skuList =
@@ -460,24 +494,26 @@ async function uploadImage() {
 
 
         for (
-  const sku of skuList
-) {
+          const sku of skuList
+        ) {
 
-  if (hasImage(sku)) {
+          if (hasImage(sku)) {
 
-    const confirmReplace =
-      confirm(
-        sku +
-        " sudah punya foto.\nReplace?"
-      );
+            const confirmReplace =
+              confirm(
+                sku +
+                " sudah punya foto.\nReplace?"
+              );
 
 
 
-    if (!confirmReplace) {
+            if (!confirmReplace) {
 
-      continue;
-    }
-  }
+              continue;
+            }
+          }
+
+
 
           await fetch(
             API_URL,
@@ -503,8 +539,15 @@ async function uploadImage() {
           "✅ Upload berhasil ke "
           + skuList.length +
           " SKU";
-        
+
+
+
         resetForm();
+
+
+
+        await loadSKU();
+
 
 
       } catch(err) {
@@ -519,9 +562,9 @@ async function uploadImage() {
 
 
 
-
-
-// delete
+// =========================
+// DELETE
+// =========================
 async function deleteImage() {
 
   const skuList =
@@ -585,6 +628,10 @@ async function deleteImage() {
 
 
 
+    await loadSKU();
+
+
+
   } catch(err) {
 
     console.log(err);
@@ -593,6 +640,12 @@ async function deleteImage() {
       "❌ Gagal menghapus foto";
   }
 }
+
+
+
+// =========================
+// RESET FORM
+// =========================
 function resetForm() {
 
   // kosongkan input sku
@@ -628,10 +681,22 @@ function resetForm() {
   document
     .getElementById("old-preview")
     .style.display = "none";
-}
-console.log(skuData);
-updateDashboard();
 
+
+
+  // kosongkan bulk preview
+  document
+    .getElementById(
+      "bulk-preview"
+    )
+    .innerHTML = "";
+}
+
+
+
+// =========================
+// DASHBOARD
+// =========================
 function updateDashboard() {
 
   const total =
@@ -666,4 +731,3 @@ function updateDashboard() {
   ).innerText =
     withoutImage;
 }
-
