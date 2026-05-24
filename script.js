@@ -50,7 +50,18 @@ async function loadSKU() {
 }
 
 loadSKU();
+function hasImage(sku) {
 
+  const found =
+    skuData.find(
+      item => item.sku == sku
+    );
+
+  return (
+    found &&
+    found.link
+  );
+}
 
 
 
@@ -379,8 +390,24 @@ async function uploadImage() {
 
 
         for (
-          const sku of skuList
-        ) {
+  const sku of skuList
+) {
+
+  if (hasImage(sku)) {
+
+    const confirmReplace =
+      confirm(
+        sku +
+        " sudah punya foto.\nReplace?"
+      );
+
+
+
+    if (!confirmReplace) {
+
+      continue;
+    }
+  }
 
           await fetch(
             API_URL,
