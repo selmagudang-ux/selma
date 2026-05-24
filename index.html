@@ -34,13 +34,18 @@
 
   <h1>Upload Foto Produk</h1>
 
-
+<div class="search-box">
 
   <input
-  type="text"
-  id="sku"
-  list="sku-list"
-  placeholder="Masukkan SKU">
+    type="text"
+    id="sku"
+    placeholder="Cari SKU">
+
+  <div id="suggestions"></div>
+
+</div>
+
+  
 <button
   type="button"
   onclick="addSKU()">
@@ -51,11 +56,7 @@
   
 <div id="sku-container"></div>
 
-<datalist id="sku-list"></datalist>
   
-
-
-
   <div
     class="drop-area"
     id="drop-area">
