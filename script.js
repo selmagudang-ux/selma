@@ -1,8 +1,11 @@
-
 const API_URL =
 "https://script.google.com/macros/s/AKfycby3o6bUEgkmLVtfXgYcMZtf5OYQWkPUinOpJq88QjwsKqfIaa9HAbHMV0QZdSchoBCr/exec";
 
+
+
 let skuData = [];
+
+
 
 async function loadSKU() {
 
@@ -12,86 +15,221 @@ async function loadSKU() {
 
   skuData =
     await response.json();
-    console.log(skuData);
-  const datalist =
-    document.getElementById("sku-list");
 
-  datalist.innerHTML = "";
-
-  skuData.forEach(item => {
-
-    const option =
-      document.createElement("option");
-
-    option.value =
-      item.sku;
-
-    datalist.appendChild(option);
-  });
+  console.log(skuData);
 }
 
 loadSKU();
 
+
+
+
+
+const dropArea =
+  document.getElementById(
+    "drop-area"
+  );
+
+const fileInput =
+  document.getElementById(
+    "image"
+  );
+
+
+
+// klik
+dropArea.addEventListener(
+  "click",
+  () => {
+
+    fileInput.click();
+  }
+);
+
+
+
+// drag over
+dropArea.addEventListener(
+  "dragover",
+  (e) => {
+
+    e.preventDefault();
+
+    dropArea.classList.add(
+      "dragover"
+    );
+  }
+);
+
+
+
+// drag leave
+dropArea.addEventListener(
+  "dragleave",
+  () => {
+
+    dropArea.classList.remove(
+      "dragover"
+    );
+  }
+);
+
+
+
+// drop
+dropArea.addEventListener(
+  "drop",
+  (e) => {
+
+    e.preventDefault();
+
+    dropArea.classList.remove(
+      "dragover"
+    );
+
+    const files =
+      e.dataTransfer.files;
+
+    fileInput.files =
+      files;
+
+    previewImage(
+      files[0]
+    );
+  }
+);
+
+
+
+// pilih file
+fileInput.addEventListener(
+  "change",
+  () => {
+
+    previewImage(
+      fileInput.files[0]
+    );
+  }
+);
+
+
+
+// preview
+function previewImage(file) {
+
+  if (!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.onload = function(e) {
+
+    const preview =
+      document.getElementById(
+        "preview"
+      );
+
+    preview.src =
+      e.target.result;
+
+    preview.style.display =
+      "block";
+  }
+
+  reader.readAsDataURL(file);
+}
+
+
+
+
+
+// upload
 async function uploadImage() {
 
-  const sku =
-    document.getElementById("sku").value;
+  const skuText =
+    document.getElementById(
+      "sku"
+    ).value;
 
   const file =
-    document.getElementById("image").files[0];
+    fileInput.files[0];
 
   const status =
-    document.getElementById("status");
+    document.getElementById(
+      "status"
+    );
 
-  if (!sku || !file) {
 
-    alert("SKU dan foto wajib diisi");
+
+  if (!skuText || !file) {
+
+    alert(
+      "SKU dan foto wajib"
+    );
+
     return;
   }
 
-  status.innerHTML = "Uploading...";
 
-  const reader = new FileReader();
+
+  const skuList =
+    skuText
+    .split("\n")
+    .map(s => s.trim())
+    .filter(s => s);
+
+
+
+  status.innerHTML =
+    "Uploading...";
+
+
+
+  const reader =
+    new FileReader();
 
   reader.readAsDataURL(file);
+
+
 
   reader.onload = async () => {
 
     try {
 
       const base64 =
-        reader.result.split(",")[1];
+        reader.result
+        .split(",")[1];
 
-      const response = await fetch(
-        API_URL,
-        {
 
-          method: "POST",
 
-          body: JSON.stringify({
+      for (const sku of skuList) {
 
-            sku: sku,
-            image: base64,
-            mime: file.type
-          })
-        }
-      );
+        await fetch(
+          API_URL,
+          {
 
-      const result =
-        await response.json();
+            method: "POST",
 
-      console.log(result);
+            body: JSON.stringify({
 
-      if (result.status == "success") {
+              sku: sku,
 
-        status.innerHTML =
-          "✅ Upload berhasil";
+              image: base64,
 
-      } else {
-
-        status.innerHTML =
-          "❌ " + result.message;
+              mime: file.type
+            })
+          }
+        );
       }
+
+
+
+      status.innerHTML =
+        "✅ Upload berhasil ke "
+        + skuList.length +
+        " SKU";
+
+
 
     } catch(err) {
 
@@ -103,102 +241,108 @@ async function uploadImage() {
   }
 }
 
+
+
+
+
+// delete
 async function deleteImage() {
 
-  const sku =
-    document.getElementById("sku").value;
+  const skuText =
+    document.getElementById(
+      "sku"
+    ).value;
 
-  if (!sku) {
+  const skuList =
+    skuText
+    .split("\n")
+    .map(s => s.trim())
+    .filter(s => s);
 
-    alert("Pilih SKU");
+
+
+  if (skuList.length == 0) {
+
+    alert(
+      "Masukkan SKU"
+    );
+
     return;
   }
 
-  const response = await fetch(
-    API_URL,
-    {
 
-      method: "POST",
 
-      body: JSON.stringify({
+  for (const sku of skuList) {
 
-        action: "delete",
-        sku: sku
-      })
-    }
-  );
+    await fetch(
+      API_URL,
+      {
 
-  const result =
-    await response.json();
+        method: "POST",
 
-  if (result.status == "success") {
+        body: JSON.stringify({
 
-    document.getElementById("status")
-      .innerHTML =
-      "Foto berhasil dihapus";
+          action: "delete",
 
-  } else {
-
-    document.getElementById("status")
-      .innerHTML =
-      result.message;
+          sku: sku
+        })
+      }
+    );
   }
+
+
+
+  document.getElementById(
+    "status"
+  ).innerHTML =
+    "Foto berhasil dihapus";
 }
-document
-  .getElementById("image")
-  .addEventListener("change", function(e) {
 
-    const file =
-      e.target.files[0];
 
-    if (!file) return;
 
-    const reader =
-      new FileReader();
 
-    reader.onload = function(event) {
 
-      const preview =
-        document.getElementById("preview");
-
-      preview.src =
-        event.target.result;
-
-      preview.style.display =
-        "block";
-    }
-
-    reader.readAsDataURL(file);
-});
-
+// preview foto lama
 document
   .getElementById("sku")
-  .addEventListener("input", function() {
+  .addEventListener(
+    "input",
+    function() {
 
-    const sku =
-      this.value;
+      const sku =
+        this.value
+        .split("\n")[0]
+        .trim();
 
-    const oldPreview =
-      document.getElementById(
-        "old-preview"
-      );
+      const oldPreview =
+        document.getElementById(
+          "old-preview"
+        );
 
-    const found =
-      skuData.find(
-        item => item.sku == sku
-      );
 
-    if (found && found.link) {
 
-      oldPreview.src =
-        found.link;
+      const found =
+        skuData.find(
+          item =>
+            item.sku == sku
+        );
 
-      oldPreview.style.display =
-        "block";
 
-    } else {
 
-      oldPreview.style.display =
-        "none";
-    }
+      if (
+        found &&
+        found.link
+      ) {
+
+        oldPreview.src =
+          found.link;
+
+        oldPreview.style.display =
+          "block";
+
+      } else {
+
+        oldPreview.style.display =
+          "none";
+      }
 });
