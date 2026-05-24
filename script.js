@@ -2,7 +2,7 @@ const API_URL =
 "https://script.google.com/macros/s/AKfycby3o6bUEgkmLVtfXgYcMZtf5OYQWkPUinOpJq88QjwsKqfIaa9HAbHMV0QZdSchoBCr/exec";
 
 
-
+let selectedSKU = [];
 let skuData = [];
 
 
@@ -20,10 +20,6 @@ async function loadSKU() {
 }
 
 loadSKU();
-
-
-
-
 
 const dropArea =
   document.getElementById(
@@ -146,10 +142,8 @@ function previewImage(file) {
 // upload
 async function uploadImage() {
 
-  const skuText =
-    document.getElementById(
-      "sku"
-    ).value;
+  cconst skuList =
+  selectedSKU;
 
   const file =
     fileInput.files[0];
@@ -169,16 +163,6 @@ async function uploadImage() {
 
     return;
   }
-
-
-
-  const skuList =
-    skuText
-    .split("\n")
-    .map(s => s.trim())
-    .filter(s => s);
-
-
 
   status.innerHTML =
     "Uploading...";
@@ -346,3 +330,87 @@ document
           "none";
       }
 });
+function addSKU() {
+
+  const input =
+    document.getElementById(
+      "sku"
+    );
+
+  const sku =
+    input.value.trim();
+
+
+
+  if (!sku) return;
+
+
+
+  if (
+    selectedSKU.includes(sku)
+  ) {
+
+    alert(
+      "SKU sudah ada"
+    );
+
+    return;
+  }
+
+
+
+  selectedSKU.push(sku);
+
+
+
+  renderSKU();
+
+
+
+  input.value = "";
+}
+
+
+function renderSKU() {
+
+  const container =
+    document.getElementById(
+      "sku-container"
+    );
+
+  container.innerHTML = "";
+
+
+
+  selectedSKU.forEach(
+    (sku, index) => {
+
+      container.innerHTML += `
+
+      <div class="sku-item">
+
+        <span>${sku}</span>
+
+        <button
+          class="remove-btn"
+          onclick="removeSKU(${index})">
+
+          X
+
+        </button>
+
+      </div>
+      `;
+    }
+  );
+}
+
+function removeSKU(index) {
+
+  selectedSKU.splice(
+    index,
+    1
+  );
+
+  renderSKU();
+}
