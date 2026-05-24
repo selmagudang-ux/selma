@@ -415,3 +415,57 @@ RESPONSIVE
     padding: 20px;
   }
 }
+
+.filter-box {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.filter-box button {
+
+  margin: 0;
+}
+
+#filter-result {
+
+  margin-bottom: 20px;
+
+  max-height: 300px;
+
+  overflow-y: auto;
+}
+
+.filter-item {
+
+  padding: 12px;
+
+  background: #f3f3f3;
+
+  border-radius: 10px;
+
+  margin-bottom: 10px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+.filter-item img {
+
+  width: 50px;
+
+  height: 50px;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+}
