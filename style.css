@@ -156,3 +156,29 @@ button:hover {
 
   margin-bottom: 10px;
 }
+
+.dashboard {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.card {
+
+  background: white;
+
+  padding: 15px;
+
+  border-radius: 15px;
+
+  text-align: center;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,0.05);
+}
