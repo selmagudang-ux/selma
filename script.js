@@ -9,22 +9,109 @@ let skuData = [];
 
 
 // =========================
-// LOAD SKU
+// ELEMENT
 // =========================
-
-async function loadSKU() {
-
-  const response = await fetch(
-    API_URL + "?action=getSKU"
+const dropArea =
+  document.getElementById(
+    "drop-area"
   );
 
-  skuData =
-    await response.json();
+const fileInput =
+  document.getElementById(
+    "image"
+  );
 
-  console.log(skuData);
+const skuInput =
+  document.getElementById(
+    "sku"
+  );
 
-  updateDashboard();
+const suggestions =
+  document.getElementById(
+    "suggestions"
+  );
+
+
+
+// =========================
+// LOAD SKU
+// =========================
+async function loadSKU() {
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=getSKU"
+      );
+
+
+
+    skuData =
+      await response.json();
+
+
+
+    console.log(skuData);
+
+
+
+    updateDashboard();
+
+
+
+  } catch(err) {
+
+    console.log(err);
+  }
 }
+
+
+
+// =========================
+// DASHBOARD
+// =========================
+function updateDashboard() {
+
+  const total =
+    skuData.length;
+
+
+
+  const withImage =
+    skuData.filter(
+      item => item.link
+    ).length;
+
+
+
+  const withoutImage =
+    total - withImage;
+
+
+
+  document.getElementById(
+    "total-sku"
+  ).innerText =
+    total;
+
+
+
+  document.getElementById(
+    "with-image"
+  ).innerText =
+    withImage;
+
+
+
+  document.getElementById(
+    "without-image"
+  ).innerText =
+    withoutImage;
+}
+
+
 
 // =========================
 // CEK ADA FOTO
@@ -36,6 +123,8 @@ function hasImage(sku) {
       item => item.sku == sku
     );
 
+
+
   return (
     found &&
     found.link
@@ -45,17 +134,96 @@ function hasImage(sku) {
 
 
 // =========================
+// SEARCH SKU
+// =========================
+skuInput.addEventListener(
+  "input",
+  function() {
+
+    const keyword =
+      this.value
+      .toLowerCase();
+
+
+
+    suggestions.innerHTML = "";
+
+
+
+    if (!keyword) return;
+
+
+
+    const filtered =
+      skuData
+      .filter(item =>
+
+        item.sku
+        .toLowerCase()
+        .includes(keyword)
+      )
+      .slice(0, 10);
+
+
+
+    filtered.forEach(item => {
+
+      suggestions.innerHTML += `
+
+      <div
+        class="suggestion-item"
+        onclick="selectSKU('${item.sku}')">
+
+        ${item.sku}
+
+      </div>
+      `;
+    });
+  }
+);
+
+
+
+// pilih suggestion
+function selectSKU(sku) {
+
+  skuInput.value =
+    sku;
+
+
+
+  suggestions.innerHTML =
+    "";
+}
+
+
+
+// close suggestion
+document.addEventListener(
+  "click",
+  function(e) {
+
+    if (
+      !e.target.closest(
+        ".search-box"
+      )
+    ) {
+
+      suggestions.innerHTML =
+        "";
+    }
+  }
+);
+
+
+
+// =========================
 // TAMBAH SKU
 // =========================
 function addSKU() {
 
-  const input =
-    document.getElementById(
-      "sku"
-    );
-
   const sku =
-    input.value.trim();
+    skuInput.value.trim();
 
 
 
@@ -84,11 +252,11 @@ function addSKU() {
 
 
 
-  input.value = "";
+  skuInput.value = "";
 
 
 
-  // preview foto lama
+  // preview lama
   const oldPreview =
     document.getElementById(
       "old-preview"
@@ -110,7 +278,11 @@ function addSKU() {
   ) {
 
     oldPreview.src =
-      found.link;
+      found.link +
+      "&t=" +
+      new Date().getTime();
+
+
 
     oldPreview.style.display =
       "block";
@@ -136,7 +308,8 @@ function renderSKU() {
 
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
 
@@ -175,6 +348,8 @@ function removeSKU(index) {
     1
   );
 
+
+
   renderSKU();
 }
 
@@ -183,17 +358,6 @@ function removeSKU(index) {
 // =========================
 // DRAG DROP
 // =========================
-const dropArea =
-  document.getElementById(
-    "drop-area"
-  );
-
-const fileInput =
-  document.getElementById(
-    "image"
-  );
-
-
 
 // klik
 dropArea.addEventListener(
@@ -245,22 +409,24 @@ dropArea.addEventListener(
       "dragover"
     );
 
+
+
     const files =
       e.dataTransfer.files;
+
+
 
     fileInput.files =
       files;
 
 
 
-    handleFiles(
-      fileInput.files
-    );
+    handleFiles(files);
 
 
 
     previewImage(
-      fileInput.files[0]
+      files[0]
     );
   }
 );
@@ -298,11 +464,8 @@ function handleFiles(files) {
 
 
 
-  bulkPreview.innerHTML = "";
-
-
-
-  selectedSKU = [];
+  bulkPreview.innerHTML =
+    "";
 
 
 
@@ -327,9 +490,16 @@ function handleFiles(files) {
 
       if (found) {
 
-        selectedSKU.push(
-          filename
-        );
+        if (
+          !selectedSKU.includes(
+            filename
+          )
+        ) {
+
+          selectedSKU.push(
+            filename
+          );
+        }
 
 
 
@@ -390,6 +560,8 @@ function previewImage(file) {
       preview.src =
         e.target.result;
 
+
+
       preview.style.display =
         "block";
     }
@@ -411,12 +583,23 @@ async function uploadImage() {
   const skuList =
     selectedSKU;
 
+
+
   const file =
     fileInput.files[0];
+
+
 
   const status =
     document.getElementById(
       "status"
+    );
+
+
+
+  const uploadBtn =
+    document.querySelector(
+      'button[onclick="uploadImage()"]'
     );
 
 
@@ -440,8 +623,20 @@ async function uploadImage() {
 
 
 
+  uploadBtn.disabled =
+    true;
+
+
+
+  uploadBtn.innerText =
+    "Uploading...";
+
+
+
   const reader =
     new FileReader();
+
+
 
   reader.readAsDataURL(
     file
@@ -464,7 +659,9 @@ async function uploadImage() {
           const sku of skuList
         ) {
 
-          if (hasImage(sku)) {
+          if (
+            hasImage(sku)
+          ) {
 
             const confirmReplace =
               confirm(
@@ -474,7 +671,9 @@ async function uploadImage() {
 
 
 
-            if (!confirmReplace) {
+            if (
+              !confirmReplace
+            ) {
 
               continue;
             }
@@ -504,8 +703,19 @@ async function uploadImage() {
 
         status.innerHTML =
           "✅ Upload berhasil ke "
-          + skuList.length +
+          +
+          skuList.length +
           " SKU";
+
+
+
+        uploadBtn.disabled =
+          false;
+
+
+
+        uploadBtn.innerText =
+          "Upload";
 
 
 
@@ -521,8 +731,20 @@ async function uploadImage() {
 
         console.log(err);
 
+
+
         status.innerHTML =
           "❌ Upload gagal";
+
+
+
+        uploadBtn.disabled =
+          false;
+
+
+
+        uploadBtn.innerText =
+          "Upload";
       }
     }
 }
@@ -537,9 +759,18 @@ async function deleteImage() {
   const skuList =
     selectedSKU;
 
+
+
   const status =
     document.getElementById(
       "status"
+    );
+
+
+
+  const deleteBtn =
+    document.querySelector(
+      'button[onclick="deleteImage()"]'
     );
 
 
@@ -558,6 +789,16 @@ async function deleteImage() {
 
 
   status.innerHTML =
+    "Deleting...";
+
+
+
+  deleteBtn.disabled =
+    true;
+
+
+
+  deleteBtn.innerText =
     "Deleting...";
 
 
@@ -591,6 +832,16 @@ async function deleteImage() {
 
 
 
+    deleteBtn.disabled =
+      false;
+
+
+
+    deleteBtn.innerText =
+      "Hapus Foto";
+
+
+
     resetForm();
 
 
@@ -603,8 +854,20 @@ async function deleteImage() {
 
     console.log(err);
 
+
+
     status.innerHTML =
       "❌ Gagal menghapus foto";
+
+
+
+    deleteBtn.disabled =
+      false;
+
+
+
+    deleteBtn.innerText =
+      "Hapus Foto";
   }
 }
 
@@ -615,153 +878,48 @@ async function deleteImage() {
 // =========================
 function resetForm() {
 
-  // kosongkan input sku
-  document
-    .getElementById("sku")
-    .value = "";
+  skuInput.value =
+    "";
 
 
 
-  // kosongkan array sku
-  selectedSKU = [];
+  selectedSKU =
+    [];
 
 
 
-  // render ulang
   renderSKU();
 
 
 
-  // reset file input
-  fileInput.value = "";
+  fileInput.value =
+    "";
 
 
 
-  // sembunyikan preview baru
-  document
-    .getElementById("preview")
-    .style.display = "none";
+  document.getElementById(
+    "preview"
+  ).style.display =
+    "none";
 
 
 
-  // sembunyikan preview lama
-  document
-    .getElementById("old-preview")
-    .style.display = "none";
+  document.getElementById(
+    "old-preview"
+  ).style.display =
+    "none";
 
 
 
-  // kosongkan bulk preview
-  document
-    .getElementById(
-      "bulk-preview"
-    )
-    .innerHTML = "";
+  document.getElementById(
+    "bulk-preview"
+  ).innerHTML =
+    "";
 }
 
 
 
 // =========================
-// DASHBOARD
+// START
 // =========================
-function updateDashboard() {
-
-  const total =
-    skuData.length;
-
-  const withImage =
-    skuData.filter(
-      item => item.link
-    ).length;
-
-  const withoutImage =
-    total - withImage;
-
-
-
-  document.getElementById(
-    "total-sku"
-  ).innerText =
-    total;
-
-
-
-  document.getElementById(
-    "with-image"
-  ).innerText =
-    withImage;
-
-
-
-  document.getElementById(
-    "without-image"
-  ).innerText =
-    withoutImage;
-}
-
-const skuInput =
-  document.getElementById(
-    "sku"
-  );
-
-const suggestions =
-  document.getElementById(
-    "suggestions"
-  );
-
-
-
-skuInput.addEventListener(
-  "input",
-  function() {
-
-    const keyword =
-      this.value
-      .toLowerCase();
-
-
-
-    suggestions.innerHTML = "";
-
-
-
-    if (!keyword) return;
-
-
-
-    const filtered =
-      skuData.filter(item =>
-
-        item.sku
-        .toLowerCase()
-        .includes(keyword)
-      )
-      .slice(0, 20);
-
-
-
-    filtered.forEach(item => {
-
-      suggestions.innerHTML += `
-
-      <div
-        class="suggestion-item"
-        onclick="selectSKU('${item.sku}')">
-
-        ${item.sku}
-
-      </div>
-      `;
-    });
-  }
-);
-
-function selectSKU(sku) {
-
-  document.getElementById(
-    "sku"
-  ).value = sku;
-  
-  suggestions.innerHTML = "";
-  addSKU();
-}
+loadSKU();
