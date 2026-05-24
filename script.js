@@ -471,8 +471,10 @@ async function deleteImage() {
     "status"
   ).innerHTML =
     "Foto berhasil dihapus";
-}
+  
 resetForm();
+}
+
 
 function resetForm() {
 
