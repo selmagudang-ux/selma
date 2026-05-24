@@ -11,6 +11,7 @@ let skuData = [];
 // =========================
 // LOAD SKU
 // =========================
+
 async function loadSKU() {
 
   const response = await fetch(
@@ -22,42 +23,8 @@ async function loadSKU() {
 
   console.log(skuData);
 
-
-
-  const datalist =
-    document.getElementById(
-      "sku-list"
-    );
-
-
-
-  datalist.innerHTML = "";
-
-
-
-  skuData.forEach(item => {
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-    option.value =
-      item.sku;
-
-    datalist.appendChild(
-      option
-    );
-  });
-
-
-
   updateDashboard();
 }
-
-loadSKU();
-
-
 
 // =========================
 // CEK ADA FOTO
@@ -730,4 +697,71 @@ function updateDashboard() {
     "without-image"
   ).innerText =
     withoutImage;
+}
+
+const skuInput =
+  document.getElementById(
+    "sku"
+  );
+
+const suggestions =
+  document.getElementById(
+    "suggestions"
+  );
+
+
+
+skuInput.addEventListener(
+  "input",
+  function() {
+
+    const keyword =
+      this.value
+      .toLowerCase();
+
+
+
+    suggestions.innerHTML = "";
+
+
+
+    if (!keyword) return;
+
+
+
+    const filtered =
+      skuData.filter(item =>
+
+        item.sku
+        .toLowerCase()
+        .includes(keyword)
+      )
+      .slice(0, 20);
+
+
+
+    filtered.forEach(item => {
+
+      suggestions.innerHTML += `
+
+      <div
+        class="suggestion-item"
+        onclick="selectSKU('${item.sku}')">
+
+        ${item.sku}
+
+      </div>
+      `;
+    });
+  }
+);
+
+function selectSKU(sku) {
+
+  document.getElementById(
+    "sku"
+  ).value = sku;
+  
+  suggestions.innerHTML = "";
+  addSKU();
 }
