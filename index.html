@@ -2,8 +2,13 @@
 <html>
 
 <head>
+
   <title>Upload Foto SKU</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link
+    rel="stylesheet"
+    href="style.css">
+
 </head>
 
 <body>
@@ -12,53 +17,68 @@
 
   <h1>Upload Foto Produk</h1>
 
- <textarea
-  id="sku"
-  placeholder="1 baris = 1 SKU"></textarea>
+
+
+  <textarea
+    id="sku"
+    placeholder="1 baris = 1 SKU"></textarea>
+
+
 
   <div
-  class="drop-area"
-  id="drop-area">
+    class="drop-area"
+    id="drop-area">
 
-  <p>Drag & Drop Foto</p>
+    <p>Drag & Drop Foto</p>
 
-  <p class="small">
-    atau klik untuk pilih file
-  </p>
+    <p class="small">
+      atau klik untuk pilih file
+    </p>
 
-  <input
-    type="file"
-    id="image"
-    hidden>
+    <input
+      type="file"
+      id="image"
+      hidden>
 
-</div>
+  </div>
+
+
 
   <img
-  id="preview"
-  style="
-    width:100%;
-    margin-top:15px;
-    border-radius:10px;
-    display:none;
-  ">
+    id="preview"
+    style="
+      width:100%;
+      margin-top:15px;
+      border-radius:10px;
+      display:none;
+    ">
+
+
+
   <h3>Foto Lama</h3>
 
-<img
-  id="old-preview"
-  onerror="this.style.display='none'"
-  style="
-    width:100%;
-    border-radius:10px;
-    display:none;
-  ">
+  <img
+    id="old-preview"
+    onerror="this.style.display='none'"
+    style="
+      width:100%;
+      border-radius:10px;
+      display:none;
+    ">
+
+
 
   <button onclick="uploadImage()">
     Upload
   </button>
-  
+
+
+
   <button onclick="deleteImage()">
-  Hapus Foto
-</button>
+    Hapus Foto
+  </button>
+
+
 
   <p id="status"></p>
 
