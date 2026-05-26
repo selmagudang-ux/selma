@@ -11,6 +11,8 @@ body {
 
 
 
+
+
 /* =========================
 DASHBOARD
 ========================= */
@@ -30,6 +32,8 @@ DASHBOARD
   margin-bottom: 25px;
 }
 
+
+
 .card {
 
   background: white;
@@ -44,6 +48,8 @@ DASHBOARD
     0 5px 20px rgba(0,0,0,0.08);
 }
 
+
+
 .card h2 {
 
   margin: 0;
@@ -52,6 +58,8 @@ DASHBOARD
 
   color: #00aa00;
 }
+
+
 
 .card p {
 
@@ -65,11 +73,91 @@ DASHBOARD
 
 
 /* =========================
+FILTER
+========================= */
+.filter-box {
+
+  max-width: 1100px;
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+
+
+.filter-box button {
+
+  margin: 0;
+}
+
+
+
+#filter-result {
+
+  max-width: 1100px;
+
+  margin: auto;
+
+  margin-bottom: 20px;
+
+  max-height: 300px;
+
+  overflow-y: auto;
+}
+
+
+
+.filter-item {
+
+  padding: 12px;
+
+  background: white;
+
+  border-radius: 12px;
+
+  margin-bottom: 10px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.05);
+}
+
+
+
+.filter-item img {
+
+  width: 50px;
+
+  height: 50px;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+}
+
+
+
+
+
+/* =========================
 MAIN BOX
 ========================= */
 .box {
 
-  max-width: 600px;
+  max-width: 650px;
 
   margin: auto;
 
@@ -82,6 +170,8 @@ MAIN BOX
   box-shadow:
     0 5px 20px rgba(0,0,0,0.1);
 }
+
+
 
 .box h1 {
 
@@ -104,6 +194,8 @@ SEARCH
   margin-bottom: 15px;
 }
 
+
+
 #sku {
 
   width: 100%;
@@ -118,6 +210,8 @@ SEARCH
 
   box-sizing: border-box;
 }
+
+
 
 #sku:focus {
 
@@ -159,6 +253,8 @@ SUGGESTIONS
   z-index: 999;
 }
 
+
+
 .suggestion-item {
 
   padding: 14px;
@@ -170,6 +266,8 @@ SUGGESTIONS
 
   transition: 0.2s;
 }
+
+
 
 .suggestion-item:hover {
 
@@ -206,6 +304,8 @@ button {
   transition: 0.2s;
 }
 
+
+
 button:hover {
 
   background: #008800;
@@ -222,6 +322,8 @@ SKU CONTAINER
 
   margin-top: 20px;
 }
+
+
 
 .sku-item {
 
@@ -240,6 +342,8 @@ SKU CONTAINER
   margin-bottom: 10px;
 }
 
+
+
 .remove-btn {
 
   width: auto;
@@ -255,6 +359,8 @@ SKU CONTAINER
   font-size: 13px;
 }
 
+
+
 .remove-btn:hover {
 
   background: darkred;
@@ -265,17 +371,17 @@ SKU CONTAINER
 
 
 /* =========================
-DROP AREA
+UPLOAD AREA STYLE GFORM
 ========================= */
 .upload-box {
 
   width: 100%;
 
-  min-height: 280px;
+  min-height: 300px;
 
   border: 3px dashed #16a34a;
 
-  border-radius: 24px;
+  border-radius: 28px;
 
   background: #f7faf7;
 
@@ -296,6 +402,8 @@ DROP AREA
   padding: 30px;
 
   box-sizing: border-box;
+
+  margin-top: 20px;
 }
 
 
@@ -320,9 +428,17 @@ DROP AREA
 
 .upload-icon {
 
-  font-size: 55px;
+  font-size: 65px;
 
-  margin-bottom: 15px;
+  line-height: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 20px;
 }
 
 
@@ -331,16 +447,18 @@ DROP AREA
 
   margin: 0;
 
-  font-size: 28px;
+  font-size: 30px;
 
-  color: #111;
+  font-weight: 700;
+
+  color: #222;
 }
 
 
 
 .upload-box p {
 
-  margin-top: 12px;
+  margin-top: 14px;
 
   font-size: 18px;
 
@@ -351,12 +469,14 @@ DROP AREA
 
 .upload-box span {
 
-  margin-top: 10px;
+  margin-top: 8px;
+
+  font-size: 14px;
 
   color: #777;
-
-  font-size: 15px;
 }
+
+
 
 
 
@@ -386,6 +506,8 @@ BULK PREVIEW
 
   margin-top: 20px;
 }
+
+
 
 .bulk-item {
 
@@ -444,7 +566,18 @@ RESPONSIVE
 ========================= */
 @media(max-width:600px) {
 
+  body {
+
+    padding: 15px;
+  }
+
   .dashboard {
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .filter-box {
 
     grid-template-columns:
       1fr;
@@ -460,58 +593,19 @@ RESPONSIVE
 
     padding: 20px;
   }
-}
 
-.filter-box {
+  .upload-box {
 
-  display: grid;
+    min-height: 250px;
+  }
 
-  grid-template-columns:
-    repeat(3,1fr);
+  .upload-box h2 {
 
-  gap: 10px;
+    font-size: 24px;
+  }
 
-  margin-bottom: 20px;
-}
+  .upload-box p {
 
-.filter-box button {
-
-  margin: 0;
-}
-
-#filter-result {
-
-  margin-bottom: 20px;
-
-  max-height: 300px;
-
-  overflow-y: auto;
-}
-
-.filter-item {
-
-  padding: 12px;
-
-  background: #f3f3f3;
-
-  border-radius: 10px;
-
-  margin-bottom: 10px;
-
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-}
-
-.filter-item img {
-
-  width: 50px;
-
-  height: 50px;
-
-  object-fit: cover;
-
-  border-radius: 10px;
+    font-size: 16px;
+  }
 }
