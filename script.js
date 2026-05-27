@@ -114,6 +114,159 @@ function updateDashboard() {
 
 
 // =========================
+// NORMALIZE
+// =========================
+function normalizeText(text) {
+
+  return text
+    .toLowerCase()
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+
+
+// =========================
+// LEVENSHTEIN
+// =========================
+function levenshtein(a, b) {
+
+  const matrix = [];
+
+
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+
+
+  for (let i = 1; i <= b.length; i++) {
+
+    for (let j = 1; j <= a.length; j++) {
+
+      if (
+        b.charAt(i - 1) ==
+        a.charAt(j - 1)
+      ) {
+
+        matrix[i][j] =
+          matrix[i - 1][j - 1];
+
+      } else {
+
+        matrix[i][j] =
+          Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+      }
+    }
+  }
+
+
+
+  return matrix[b.length][a.length];
+}
+
+
+
+// =========================
+// FIND BEST SKU
+// =========================
+function findBestSKU(filename) {
+
+  const cleanFile =
+    normalizeText(filename);
+
+
+
+  let bestMatch = null;
+
+  let bestScore = 999;
+
+
+
+  for (const item of skuData) {
+
+    const cleanSku =
+      normalizeText(item.sku);
+
+
+
+    // exact
+    if (
+      cleanFile ==
+      cleanSku
+    ) {
+
+      return {
+        sku: item.sku,
+        score: 0
+      };
+    }
+
+
+
+    // includes
+    if (
+      cleanFile.includes(cleanSku) ||
+      cleanSku.includes(cleanFile)
+    ) {
+
+      return {
+        sku: item.sku,
+        score: 1
+      };
+    }
+
+
+
+    // typo match
+    const distance =
+      levenshtein(
+        cleanFile,
+        cleanSku
+      );
+
+
+
+    if (
+      distance < bestScore
+    ) {
+
+      bestScore = distance;
+
+      bestMatch = item.sku;
+    }
+  }
+
+
+
+  // toleransi typo
+  if (bestScore <= 3) {
+
+    return {
+      sku: bestMatch,
+      score: bestScore
+    };
+  }
+
+
+
+  return null;
+}
+
+
+
+// =========================
 // CEK ADA FOTO
 // =========================
 function hasImage(sku) {
@@ -146,7 +299,8 @@ skuInput.addEventListener(
 
 
 
-    suggestions.innerHTML = "";
+    suggestions.innerHTML =
+      "";
 
 
 
@@ -184,7 +338,9 @@ skuInput.addEventListener(
 
 
 
-// pilih suggestion
+// =========================
+// SELECT SKU
+// =========================
 function selectSKU(sku) {
 
   skuInput.value =
@@ -198,7 +354,9 @@ function selectSKU(sku) {
 
 
 
-// close suggestion
+// =========================
+// CLOSE SUGGESTION
+// =========================
 document.addEventListener(
   "click",
   function(e) {
@@ -252,11 +410,11 @@ function addSKU() {
 
 
 
-  skuInput.value = "";
+  skuInput.value =
+    "";
 
 
 
-  // preview lama
   const oldPreview =
     document.getElementById(
       "old-preview"
@@ -472,42 +630,62 @@ function handleFiles(files) {
   Array.from(files)
     .forEach(file => {
 
+      const originalName =
+        file.name;
+
+
+
       const filename =
         file.name
-        .split(".")[0]
-        .trim();
+        .split(".")[0];
 
 
 
-      const found =
-        skuData.find(
-          item =>
-            item.sku ==
-            filename
-        );
+      const result =
+        findBestSKU(filename);
 
 
 
-      if (found) {
+      // MATCH
+      if (result) {
 
         if (
           !selectedSKU.includes(
-            filename
+            result.sku
           )
         ) {
 
           selectedSKU.push(
-            filename
+            result.sku
           );
         }
 
 
 
+        const scoreText =
+          result.score == 0
+          ? "Exact Match"
+          : result.score == 1
+          ? "Similar Match"
+          : "Typo Match";
+
+
+
         bulkPreview.innerHTML += `
 
-        <div class="bulk-item">
+        <div class="bulk-item success">
 
-          ✅ ${filename}
+          ✅ ${originalName}
+
+          <br>
+
+          → ${result.sku}
+
+          <br>
+
+          <small>
+            ${scoreText}
+          </small>
 
         </div>
         `;
@@ -516,10 +694,13 @@ function handleFiles(files) {
 
         bulkPreview.innerHTML += `
 
-        <div class="bulk-item">
+        <div class="bulk-item error">
 
-          ❌ ${filename}
-          (SKU tidak ada)
+          ❌ ${originalName}
+
+          <br>
+
+          SKU tidak ditemukan
 
         </div>
         `;
@@ -534,7 +715,7 @@ function handleFiles(files) {
 
 
 // =========================
-// PREVIEW FOTO BARU
+// PREVIEW FOTO
 // =========================
 function previewImage(file) {
 
@@ -585,8 +766,10 @@ async function uploadImage() {
 
 
 
-  const file =
-    fileInput.files[0];
+  const files =
+    Array.from(
+      fileInput.files
+    );
 
 
 
@@ -606,7 +789,7 @@ async function uploadImage() {
 
   if (
     skuList.length == 0 ||
-    !file
+    files.length == 0
   ) {
 
     alert(
@@ -633,120 +816,158 @@ async function uploadImage() {
 
 
 
-  const reader =
-    new FileReader();
+  try {
+
+    for (const file of files) {
+
+      const filename =
+        file.name
+        .split(".")[0];
 
 
 
-  reader.readAsDataURL(
-    file
-  );
+      const result =
+        findBestSKU(filename);
 
 
 
-  reader.onload =
-    async () => {
-
-      try {
-
-        const base64 =
-          reader.result
-          .split(",")[1];
+      if (!result) continue;
 
 
 
-        for (
-          const sku of skuList
+      const sku =
+        result.sku;
+
+
+
+      if (
+        hasImage(sku)
+      ) {
+
+        const confirmReplace =
+          confirm(
+            sku +
+            " sudah punya foto.\nReplace?"
+          );
+
+
+
+        if (
+          !confirmReplace
         ) {
 
-          if (
-            hasImage(sku)
-          ) {
-
-            const confirmReplace =
-              confirm(
-                sku +
-                " sudah punya foto.\nReplace?"
-              );
-
-
-
-            if (
-              !confirmReplace
-            ) {
-
-              continue;
-            }
-          }
-
-
-
-          await fetch(
-            API_URL,
-            {
-
-              method: "POST",
-
-              body: JSON.stringify({
-
-                sku: sku,
-
-                image: base64,
-
-                mime: file.type
-              })
-            }
-          );
+          continue;
         }
-
-
-
-        status.innerHTML =
-          "✅ Upload berhasil ke "
-          +
-          skuList.length +
-          " SKU";
-
-
-
-        uploadBtn.disabled =
-          false;
-
-
-
-        uploadBtn.innerText =
-          "Upload";
-
-
-
-        resetForm();
-
-
-
-        await loadSKU();
-
-
-
-      } catch(err) {
-
-        console.log(err);
-
-
-
-        status.innerHTML =
-          "❌ Upload gagal";
-
-
-
-        uploadBtn.disabled =
-          false;
-
-
-
-        uploadBtn.innerText =
-          "Upload";
       }
+
+
+
+      const base64 =
+        await toBase64(file);
+
+
+
+      await fetch(
+        API_URL,
+        {
+
+          method: "POST",
+
+          body: JSON.stringify({
+
+            sku: sku,
+
+            image: base64,
+
+            mime: file.type
+          })
+        }
+      );
     }
+
+
+
+    status.innerHTML =
+      "✅ Upload berhasil";
+
+
+
+    uploadBtn.disabled =
+      false;
+
+
+
+    uploadBtn.innerText =
+      "Upload";
+
+
+
+    resetForm();
+
+
+
+    await loadSKU();
+
+
+
+  } catch(err) {
+
+    console.log(err);
+
+
+
+    status.innerHTML =
+      "❌ Upload gagal";
+
+
+
+    uploadBtn.disabled =
+      false;
+
+
+
+    uploadBtn.innerText =
+      "Upload";
+  }
+}
+
+
+
+// =========================
+// BASE64
+// =========================
+function toBase64(file) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+
+
+      reader.onload =
+        () => {
+
+          resolve(
+            reader.result
+            .split(",")[1]
+          );
+        };
+
+
+
+      reader.onerror =
+        error =>
+          reject(error);
+    }
+  );
 }
 
 
@@ -920,11 +1141,8 @@ function resetForm() {
 
 
 // =========================
-// START
+// FILTER SKU
 // =========================
-loadSKU();
-
-
 function filterSKU(type) {
 
   const result =
@@ -934,7 +1152,8 @@ function filterSKU(type) {
 
 
 
-  result.innerHTML = "";
+  result.innerHTML =
+    "";
 
 
 
@@ -944,7 +1163,8 @@ function filterSKU(type) {
 
   if (type == "all") {
 
-    filtered = skuData;
+    filtered =
+      skuData;
 
   } else if (
     type == "with-image"
@@ -996,3 +1216,10 @@ function filterSKU(type) {
     `;
   });
 }
+
+
+
+// =========================
+// START
+// =========================
+loadSKU();
