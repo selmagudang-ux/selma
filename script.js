@@ -53,10 +53,6 @@ async function loadSKU() {
 
 
 
-    console.log(skuData);
-
-
-
     updateDashboard();
 
 
@@ -229,7 +225,7 @@ function findBestSKU(filename) {
 
 
 
-    // typo match
+    // typo
     const distance =
       levenshtein(
         cleanFile,
@@ -239,19 +235,23 @@ function findBestSKU(filename) {
 
 
     if (
-      distance < bestScore
+      distance <
+      bestScore
     ) {
 
-      bestScore = distance;
+      bestScore =
+        distance;
 
-      bestMatch = item.sku;
+      bestMatch =
+        item.sku;
     }
   }
 
 
 
-  // toleransi typo
-  if (bestScore <= 3) {
+  if (
+    bestScore <= 3
+  ) {
 
     return {
       sku: bestMatch,
@@ -267,13 +267,14 @@ function findBestSKU(filename) {
 
 
 // =========================
-// CEK ADA FOTO
+// CEK FOTO
 // =========================
 function hasImage(sku) {
 
   const found =
     skuData.find(
-      item => item.sku == sku
+      item =>
+        item.sku == sku
     );
 
 
@@ -376,7 +377,7 @@ document.addEventListener(
 
 
 // =========================
-// TAMBAH SKU
+// ADD SKU
 // =========================
 function addSKU() {
 
@@ -390,7 +391,9 @@ function addSKU() {
 
 
   if (
-    selectedSKU.includes(sku)
+    selectedSKU.includes(
+      sku
+    )
   ) {
 
     alert(
@@ -402,7 +405,9 @@ function addSKU() {
 
 
 
-  selectedSKU.push(sku);
+  selectedSKU.push(
+    sku
+  );
 
 
 
@@ -579,7 +584,9 @@ dropArea.addEventListener(
 
 
 
-    handleFiles(files);
+    handleFiles(
+      files
+    );
 
 
 
@@ -642,11 +649,12 @@ function handleFiles(files) {
 
 
       const result =
-        findBestSKU(filename);
+        findBestSKU(
+          filename
+        );
 
 
 
-      // MATCH
       if (result) {
 
         if (
@@ -757,14 +765,48 @@ function previewImage(file) {
 
 
 // =========================
+// BASE64
+// =========================
+function toBase64(file) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+
+
+      reader.onload =
+        () => {
+
+          resolve(
+            reader.result
+            .split(",")[1]
+          );
+        };
+
+
+
+      reader.onerror =
+        error =>
+          reject(error);
+    }
+  );
+}
+
+
+
+// =========================
 // UPLOAD
 // =========================
 async function uploadImage() {
-
-  const skuList =
-    selectedSKU;
-
-
 
   const files =
     Array.from(
@@ -788,12 +830,11 @@ async function uploadImage() {
 
 
   if (
-    skuList.length == 0 ||
     files.length == 0
   ) {
 
     alert(
-      "SKU dan foto wajib"
+      "Pilih foto dulu"
     );
 
     return;
@@ -818,77 +859,173 @@ async function uploadImage() {
 
   try {
 
-    for (const file of files) {
+    // =====================
+    // MODE 1
+    // 1 FOTO → BANYAK SKU
+    // =====================
+    if (
+      files.length == 1 &&
+      selectedSKU.length > 0
+    ) {
 
-      const filename =
-        file.name
-        .split(".")[0];
-
-
-
-      const result =
-        findBestSKU(filename);
-
-
-
-      if (!result) continue;
-
-
-
-      const sku =
-        result.sku;
-
-
-
-      if (
-        hasImage(sku)
-      ) {
-
-        const confirmReplace =
-          confirm(
-            sku +
-            " sudah punya foto.\nReplace?"
-          );
-
-
-
-        if (
-          !confirmReplace
-        ) {
-
-          continue;
-        }
-      }
+      const file =
+        files[0];
 
 
 
       const base64 =
-        await toBase64(file);
+        await toBase64(
+          file
+        );
 
 
 
-      await fetch(
-        API_URL,
-        {
+      for (
+        const sku of selectedSKU
+      ) {
 
-          method: "POST",
+        if (
+          hasImage(sku)
+        ) {
 
-          body: JSON.stringify({
+          const confirmReplace =
+            confirm(
+              sku +
+              " sudah punya foto.\nReplace?"
+            );
 
-            sku: sku,
 
-            image: base64,
 
-            mime: file.type
-          })
+          if (
+            !confirmReplace
+          ) {
+
+            continue;
+          }
         }
-      );
+
+
+
+        await fetch(
+          API_URL,
+          {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+              sku: sku,
+
+              image: base64,
+
+              mime: file.type
+            })
+          }
+        );
+      }
+
+
+
+      status.innerHTML =
+        `✅ 1 foto berhasil upload ke ${selectedSKU.length} SKU`;
     }
 
 
 
-    status.innerHTML =
-      "✅ Upload berhasil";
+    // =====================
+    // MODE 2
+    // AUTO MULTI FOTO
+    // =====================
+    else {
+
+      let success =
+        0;
+
+
+
+      for (
+        const file of files
+      ) {
+
+        const filename =
+          file.name
+          .split(".")[0];
+
+
+
+        const result =
+          findBestSKU(
+            filename
+          );
+
+
+
+        if (!result)
+          continue;
+
+
+
+        const sku =
+          result.sku;
+
+
+
+        if (
+          hasImage(sku)
+        ) {
+
+          const confirmReplace =
+            confirm(
+              sku +
+              " sudah punya foto.\nReplace?"
+            );
+
+
+
+          if (
+            !confirmReplace
+          ) {
+
+            continue;
+          }
+        }
+
+
+
+        const base64 =
+          await toBase64(
+            file
+          );
+
+
+
+        await fetch(
+          API_URL,
+          {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+              sku: sku,
+
+              image: base64,
+
+              mime: file.type
+            })
+          }
+        );
+
+
+
+        success++;
+      }
+
+
+
+      status.innerHTML =
+        `✅ ${success} foto berhasil upload otomatis`;
+    }
 
 
 
@@ -929,45 +1066,6 @@ async function uploadImage() {
     uploadBtn.innerText =
       "Upload";
   }
-}
-
-
-
-// =========================
-// BASE64
-// =========================
-function toBase64(file) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      const reader =
-        new FileReader();
-
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-
-
-      reader.onload =
-        () => {
-
-          resolve(
-            reader.result
-            .split(",")[1]
-          );
-        };
-
-
-
-      reader.onerror =
-        error =>
-          reject(error);
-    }
-  );
 }
 
 
@@ -1095,7 +1193,7 @@ async function deleteImage() {
 
 
 // =========================
-// RESET FORM
+// RESET
 // =========================
 function resetForm() {
 
@@ -1157,11 +1255,14 @@ function filterSKU(type) {
 
 
 
-  let filtered = [];
+  let filtered =
+    [];
 
 
 
-  if (type == "all") {
+  if (
+    type == "all"
+  ) {
 
     filtered =
       skuData;
