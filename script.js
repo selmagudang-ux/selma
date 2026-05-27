@@ -996,7 +996,7 @@ async function uploadImage() {
 
 
       status.innerHTML =
-        `✅ Upload cepat ke ${selectedSKU.length} SKU`;
+        `✅ Upload ke ${selectedSKU.length} SKU`;
     }
 
 
