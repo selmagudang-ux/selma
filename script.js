@@ -267,7 +267,7 @@ function findBestSKU(filename) {
 
 
 // =========================
-// CEK FOTO
+// CHECK IMAGE
 // =========================
 function hasImage(sku) {
 
@@ -723,7 +723,7 @@ function handleFiles(files) {
 
 
 // =========================
-// PREVIEW FOTO
+// PREVIEW IMAGE
 // =========================
 function previewImage(file) {
 
@@ -765,12 +765,12 @@ function previewImage(file) {
 
 
 // =========================
-// BASE64
+// COMPRESS IMAGE
 // =========================
-function toBase64(file) {
+function compressImage(file) {
 
   return new Promise(
-    (resolve, reject) => {
+    (resolve) => {
 
       const reader =
         new FileReader();
@@ -784,19 +784,98 @@ function toBase64(file) {
 
 
       reader.onload =
-        () => {
+        function(event) {
 
-          resolve(
-            reader.result
-            .split(",")[1]
-          );
+          const img =
+            new Image();
+
+
+
+          img.src =
+            event.target.result;
+
+
+
+          img.onload =
+            function() {
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+
+
+              const maxWidth =
+                1200;
+
+
+
+              let width =
+                img.width;
+
+              let height =
+                img.height;
+
+
+
+              if (
+                width > maxWidth
+              ) {
+
+                height =
+                  height *
+                  (
+                    maxWidth /
+                    width
+                  );
+
+                width =
+                  maxWidth;
+              }
+
+
+
+              canvas.width =
+                width;
+
+              canvas.height =
+                height;
+
+
+
+              const ctx =
+                canvas.getContext(
+                  "2d"
+                );
+
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+
+              const base64 =
+                canvas
+                .toDataURL(
+                  "image/jpeg",
+                  0.7
+                )
+                .split(",")[1];
+
+
+
+              resolve(
+                base64
+              );
+            };
         };
-
-
-
-      reader.onerror =
-        error =>
-          reject(error);
     }
   );
 }
@@ -804,7 +883,7 @@ function toBase64(file) {
 
 
 // =========================
-// UPLOAD
+// FAST UPLOAD
 // =========================
 async function uploadImage() {
 
@@ -859,6 +938,10 @@ async function uploadImage() {
 
   try {
 
+    let uploadTasks = [];
+
+
+
     // =====================
     // MODE 1
     // 1 FOTO → BANYAK SKU
@@ -873,75 +956,56 @@ async function uploadImage() {
 
 
 
+      // compress SEKALI
       const base64 =
-        await toBase64(
+        await compressImage(
           file
         );
 
 
 
-      for (
-        const sku of selectedSKU
-      ) {
+      uploadTasks =
+        selectedSKU.map(
+          sku => {
 
-        if (
-          hasImage(sku)
-        ) {
+            return fetch(
+              API_URL,
+              {
 
-          const confirmReplace =
-            confirm(
-              sku +
-              " sudah punya foto.\nReplace?"
+                method: "POST",
+
+                body: JSON.stringify({
+
+                  sku: sku,
+
+                  image: base64,
+
+                  mime: "image/jpeg"
+                })
+              }
             );
-
-
-
-          if (
-            !confirmReplace
-          ) {
-
-            continue;
-          }
-        }
-
-
-
-        await fetch(
-          API_URL,
-          {
-
-            method: "POST",
-
-            body: JSON.stringify({
-
-              sku: sku,
-
-              image: base64,
-
-              mime: file.type
-            })
           }
         );
-      }
+
+
+
+      await Promise.all(
+        uploadTasks
+      );
 
 
 
       status.innerHTML =
-        `✅ 1 foto berhasil upload ke ${selectedSKU.length} SKU`;
+        `✅ Upload cepat ke ${selectedSKU.length} SKU`;
     }
 
 
 
     // =====================
     // MODE 2
-    // AUTO MULTI FOTO
+    // MULTI FOTO AUTO SKU
     // =====================
     else {
-
-      let success =
-        0;
-
-
 
       for (
         const file of files
@@ -965,66 +1029,44 @@ async function uploadImage() {
 
 
 
-        const sku =
-          result.sku;
-
-
-
-        if (
-          hasImage(sku)
-        ) {
-
-          const confirmReplace =
-            confirm(
-              sku +
-              " sudah punya foto.\nReplace?"
-            );
-
-
-
-          if (
-            !confirmReplace
-          ) {
-
-            continue;
-          }
-        }
-
-
-
         const base64 =
-          await toBase64(
+          await compressImage(
             file
           );
 
 
 
-        await fetch(
-          API_URL,
-          {
+        uploadTasks.push(
 
-            method: "POST",
+          fetch(
+            API_URL,
+            {
 
-            body: JSON.stringify({
+              method: "POST",
 
-              sku: sku,
+              body: JSON.stringify({
 
-              image: base64,
+                sku: result.sku,
 
-              mime: file.type
-            })
-          }
+                image: base64,
+
+                mime: "image/jpeg"
+              })
+            }
+          )
         );
-
-
-
-        success++;
       }
 
 
 
+      await Promise.all(
+        uploadTasks
+      );
+
+
+
       status.innerHTML =
-        `✅ ${success} foto berhasil upload otomatis`;
+        `✅ ${uploadTasks.length} foto berhasil upload`;
     }
 
 
@@ -1071,7 +1113,7 @@ async function uploadImage() {
 
 
 // =========================
-// DELETE
+// DELETE IMAGE
 // =========================
 async function deleteImage() {
 
@@ -1124,25 +1166,28 @@ async function deleteImage() {
 
   try {
 
-    for (
-      const sku of skuList
-    ) {
+    await Promise.all(
 
-      await fetch(
-        API_URL,
-        {
+      skuList.map(
+        sku => {
 
-          method: "POST",
+          return fetch(
+            API_URL,
+            {
 
-          body: JSON.stringify({
+              method: "POST",
 
-            action: "delete",
+              body: JSON.stringify({
 
-            sku: sku
-          })
+                action: "delete",
+
+                sku: sku
+              })
+            }
+          );
         }
-      );
-    }
+      )
+    );
 
 
 
